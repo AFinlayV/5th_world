@@ -116,6 +116,66 @@ their intentions and emotions clearly without requiring extensive background kno
 audience."""
 
 characters_data = {
+    "Axel": {
+        "model": "gpt-4",
+        "voice": "alloy",
+        "dispositions": {"adventure": 0.9, "science": 0.7, "culture": 0.2},
+        "background": "Axel, an engineer from the Manufacturing Ring, thrives on innovation and the thrill of discovery. His work on sustainable energy sources has gained widespread attention."
+    },
+    "Briar": {
+        "model": "gpt-4",
+        "voice": "echo",
+        "dispositions": {"politics": -0.8, "history": 0.5, "economy": 0.4},
+        "background": "Briar is a political activist known for her fiery speeches and dedication to workers' rights. Her influence is growing, much to the concern of the station's elite."
+    },
+    "Cleo": {
+        "model": "gpt-4",
+        "voice": "fable",
+        "dispositions": {"art": 0.8, "technology": -0.3, "environment": 0.7},
+        "background": "A celebrated artist from the Artisan Ring, Cleo's installations challenge viewers to see the beauty in recycled materials, blending environmental activism with art."
+    },
+    "Dex": {
+        "model": "gpt-4",
+        "voice": "shimmer",
+        "dispositions": {"sports": 0.9, "gambling": 0.6, "culture": -0.4},
+        "background": "Dex, a former athlete turned sports commentator, is beloved for his insightful, albeit controversial, takes on the station's sporting events and betting pools."
+    },
+    "Eve": {
+        "model": "gpt-4",
+        "voice": "nova",
+        "dispositions": {"science": 0.8, "politics": 0.4, "adventure": 0.5},
+        "background": "Eve is a scientist whose research on artificial ecosystems has put her at odds with several powerful factions, yet her discoveries could revolutionize life on the station."
+    },
+    "Finn": {
+        "model": "gpt-4",
+        "voice": "onyx",
+        "dispositions": {"economy": 0.9, "history": -0.2, "technology": 0.4},
+        "background": "As a financial analyst, Finn's predictions have a near-mystical accuracy, making him a sought-after advisor for the station's most influential traders and investors."
+    },
+    "Gia": {
+        "model": "gpt-4",
+        "voice": "alloy",
+        "dispositions": {"environment": 0.9, "art": 0.6, "science": -0.5},
+        "background": "Gia leads the station's largest environmental advocacy group, fighting tirelessly to maintain the 5th World's ecosystems against unchecked technological expansion."
+    },
+    "Holt": {
+        "model": "gpt-4",
+        "voice": "echo",
+        "dispositions": {"technology": 0.8, "sports": -0.7, "adventure": 0.6},
+        "background": "A tech entrepreneur whose startup is on the brink of launching a game-changing transportation technology, Holt is as adventurous in business as he is in life."
+    },
+    "Isla": {
+        "model": "gpt-4",
+        "voice": "fable",
+        "dispositions": {"culture": 0.9, "economy": -0.5, "politics": 0.3},
+        "background": "Isla, a cultural anthropologist, has spent years documenting the diverse societies of the 5th World, offering invaluable insights into its complex social fabric."
+    },
+    "Jude": {
+        "model": "gpt-4",
+        "voice": "shimmer",
+        "dispositions": {"history": 0.8, "art": 0.7, "science": -0.4},
+        "background": "An historian specializing in the 5th World's formation and growth, Jude's works are essential reading for anyone looking to understand the station's place in the cosmos."
+    },
     "Zara": {
         "model": "gpt-4",
         "voice": "nova",
@@ -209,6 +269,7 @@ class Conversation:
         self.dialogue_history.append({"character": npc_name, "message": message})
 
     def conduct_round(self):
+        print(f"Conducting a round of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
         for npc in self.participants:
             prompt = self.build_context(npc)
             message = npc.client.chat.completions.create(
