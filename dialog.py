@@ -15,7 +15,7 @@ TODO: Add a way to load the characters from a file
 TODO: save an entire conversation to an audio file. (append mp3?)
 TODO: Add a way to save the conversation to a file (json?)
 TODO: Add a way to load a conversation from a file (json?)
-
+TODO: Make the code model agnostic so that it doesn't have to run on GPT and can run on local llama or mistral models
 
 """
 OpenAI.api_key = os.environ.get("OPENAI_API_KEY")
