@@ -6,6 +6,9 @@ import random
 import json
 import langchain
 import pyttsx3
+from pathlib import Path
+from openai import OpenAI
+client = OpenAI()
 
 """
 This will run the dialogue system for a bartending game where characters are having conversations
@@ -35,6 +38,20 @@ async def main() -> None:
 
 asyncio.run(main())
 
+from pathlib import Path
+from openai import OpenAI
+client = OpenAI()
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+response = client.audio.speech.create(
+  model="tts-1",
+  voice="alloy",
+  input="Today is a wonderful day to build something people love!"
+)
+
+response.stream_to_file(speech_file_path)
+
+
 This will run similar to a turn based game, where each character says one thing each round
 And the order is randomized each round with something like a initiative roll
 The characters will be given a context of three parts. One is global context of the things going out in the world outside the bar.
@@ -57,13 +74,17 @@ class NPC:
         self.background = ""
         self.messages = []
         self.client = OpenAI()
-        self.voice = "en-us+f4"
+        self.voice = 'alloy'
 
     def speak(self, message):
-        engine = pyttsx3.init()
-        engine.setProperty('voice', self.voice)
-        engine.say(message)
-        engine.runAndWait()
+        speech_file_path = Path(__file__).parent / f"{self.name}.mp3"
+        response = client.audio.speech.create(
+            model="tts-1",
+            voice=self.voice,
+            input=message
+        )
+        response.stream_to_file(speech_file_path)
+        os.system(f"mpg123 {speech_file_path}")
     def add_message(self, message):
         self.messages.append(message)
 
@@ -118,7 +139,7 @@ class NPC:
                 "content": f"Global Context: {global_context} \n\nPersonal Context: {personal_context} \n\nLocal Context: {local_context} \n\n"
                            f"A number of people are having a conversation at a bar.\n\n"
                            f"Here is the context for the conversation: {messages}"
-                           f"based on this global context, and the character {self.name} and their personal context, {self.name} would respond with the following:\n\n"
+                           f"based on this global context, and the character {self.name} and their personal context, {self.name} would respond with the following (remember to only respond with output that will be spoken in the character's voice):\n\n"
             }
         ]
         return context
@@ -127,16 +148,20 @@ class NPC:
         return response.choices[0].message.content
 
 def main():
+    voicelist = ['nova', 'shimmer', 'echo', 'onyx', 'fable', 'alloy']
     # create the npcs
     npc1 = NPC("Bob", "gpt-4", os.environ.get("OPENAI_API_KEY"))
     npc2 = NPC("Alice", "gpt-4", os.environ.get("OPENAI_API_KEY"))
     npc3 = NPC("Charlie", "gpt-4", os.environ.get("OPENAI_API_KEY"))
     npcs = [npc1, npc2, npc3]
+    # set npc voices
+    for npc in npcs:
+        npc.voice = voicelist.pop(random.randint(0, len(voicelist) - 1))
     # create the contexts
-    global_context = "There is a festifal celebrating the aniversary of the lasting peace from 100 years ago"
-    npc1.background = "Bob was a soldier in the war, and he is now a member of the community garden club"
-    npc2.background = "Alice is a merchant who sells flowers and other goods at the market"
-    npc3.background = "Charlie is a spy who is working for the enemy, he needs information about a secret flower but doesn't want to let on what he's looking for"
+    global_context = "There is a festival celebrating the anniversary of the lasting peace from 100 years ago"
+    npc1.background = "Bob was a soldier in the war, and he is now a member of the community garden club he believes that the flowers are the most important part of the festival and that the peace is a fragile thing that needs to be protected at all costs."
+    npc2.background = "Alice is a merchant who sells flowers and other goods at the market, she believes that flowers are a profit center and that the peace is a good thing but not as important as the flowers"
+    npc3.background = "Charlie is a spy who is working for the enemy, he needs information about a secret flower that can end the world but doesn't want to let on what he's looking for"
     local_context = "The bar is a popular hangout for peaceful neighbors"
     # create the instructions
     instructions = ("The characters are having a conversation at the bar. Respond only with the words that that character would say, without any context or commentary."
@@ -153,7 +178,7 @@ def main():
             npc.add_message(message)
             messages.append(message)
             print(f"{npc.get_name()} says: {message}\n~~~~~~~~~~~~~~~~~~~~~\n")
-            #npc.speak(message)
+            npc.speak(message)
     # print the conversation
     for npc in npcs:
         print(npc.get_name())
@@ -166,4 +191,8 @@ def main():
 
 
 if __name__ == "__main__":
+    # npc_test = NPC("Bob", "gpt-4", os.environ.get("OPENAI_API_KEY"))
+    # npc_test.voice = 'alloy'
+    # npc_test.speak("Hello, I am Bob, and I am a character in a game")
     main()
+
