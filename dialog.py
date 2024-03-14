@@ -3,7 +3,21 @@ import os
 import random
 import json
 from pathlib import Path
+"""
+TODO: Make the text generation and the playing of audio async, so that the playing of audio doesn't stop the text generation
+TODO: Add a way to update the disposition of the characters
+TODO: make context and characters external to the code and saved in a database or a file
+TODO: make the conversation history persistent
+TODO: Add a way to save the conversation history to a file
+TODO: Add a way to load a conversation history from a file
+TODO: Add a way to save the characters to a file
+TODO: Add a way to load the characters from a file
+TODO: save an entire conversation to an audio file. (append mp3?)
+TODO: Add a way to save the conversation to a file (json?)
+TODO: Add a way to load a conversation from a file (json?)
 
+
+"""
 OpenAI.api_key = os.environ.get("OPENAI_API_KEY")
 GLOBAL = """
     The 5th World Station, an architectural marvel and a testament to the power of unity and 
