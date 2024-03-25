@@ -67,11 +67,11 @@ class NPC:
         if isinstance(value, float) and -1 <= value <= 1:
             self.dispositions[topic] = value
 
-    async def generate_speech(self, message, file_name):
+    async def speak(self, message):
         if verbose:
-            logger.info(f"Generating speech for {self.name}: {message}")
+            logger.info(f"Speaking for {self.name}: {message}")
         if dev_mode:
-            subprocess.run(["say", "-o", file_name, message])
+            subprocess.run(["say", "-v", self.voice, message])
         else:
             # Use OpenAI's text-to-speech API in production mode
             # (Code for OpenAI's text-to-speech API goes here)
@@ -90,7 +90,7 @@ class Conversation:
         personal_context = npc.background + " " + ". ".join(
             [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages} Instructions:{self.instructions}"
+        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
         return prompt
 
     def add_message(self, npc_name, message):
@@ -124,9 +124,7 @@ class Conversation:
             )
             message = response.content[0].text.strip()
             self.add_message(npc.name, message)
-            file_name = f"{npc.name}_round_{round_num}_dialogue_{dialogue_num}.mp3"
-            await npc.generate_speech(message, file_name)
-            return file_name
+            await npc.speak(message)
         except anthropic.APIError as e:
             logger.error(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
         except Exception as e:
@@ -141,13 +139,7 @@ class Conversation:
             dialogue_task = asyncio.create_task(self.generate_dialogue(npc, round_num, i + 1))
             dialogue_tasks.append(dialogue_task)
 
-        file_names = await asyncio.gather(*dialogue_tasks)
-
-        for file_name in file_names:
-            if file_name:
-                if verbose:
-                    logger.info(f"Playing speech file: {file_name}")
-                subprocess.run(["afplay", file_name])
+        await asyncio.gather(*dialogue_tasks)
 
 
 def load_characters(file_path):
