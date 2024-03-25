@@ -69,7 +69,7 @@ class Conversation:
     def build_context(self, npc):
         personal_context = npc.background + " " + ". ".join([f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
+        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages} The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open ended question that invites conversation"
         return prompt
 
     def add_message(self, npc_name, message):
