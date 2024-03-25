@@ -10,13 +10,7 @@ from openai import OpenAI
 import re
 
 """
-TODO: Add a way to update the disposition of the characters based on the conversation
-TODO: Make the conversation history persistent
-TODO: Add a way to save the conversation history to a file
-TODO: Add a way to load the conversation history from a file
-TODO: Save an entire conversation to an audio file (append mp3?)
-TODO: Add a way to save the conversation to a file (json?)
-TODO: Add a way to load a conversation from a file (json?)
+This script demonstrates how to use the Anthropic API to generate dialogue between NPCs in a conversational setting.
 """
 
 # Configure logging
