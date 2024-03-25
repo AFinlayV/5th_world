@@ -6,6 +6,7 @@ from pathlib import Path
 import asyncio
 import logging
 import subprocess
+from openai import OpenAI
 
 """
 TODO: Add a way to update the disposition of the characters based on the conversation
@@ -25,13 +26,16 @@ logger = logging.getLogger(__name__)
 verbose = True
 
 # Dev mode setting
-dev_mode = False
+dev_mode = True
 
 try:
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 except anthropic.APIKeyError as e:
     logger.error(f"Error: {e}. Please make sure the ANTHROPIC_API_KEY environment variable is set correctly.")
     exit(1)
+
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+OpenAI.api_key = openai_api_key
 
 
 def read_file(file_path):
@@ -67,15 +71,19 @@ class NPC:
         if isinstance(value, float) and -1 <= value <= 1:
             self.dispositions[topic] = value
 
-    async def speak(self, message):
+    async def speak(self, message, file_name):
         if verbose:
             logger.info(f"Speaking for {self.name}: {message}")
         if dev_mode:
-            subprocess.run(["say", "-v", self.voice, message])
+            subprocess.run(["say", message])
         else:
-            # Use OpenAI's text-to-speech API in production mode
-            # (Code for OpenAI's text-to-speech API goes here)
-            pass
+            response = OpenAI().audio.speech.create(
+                model="tts-1",
+                voice=self.voice,
+                input=message
+            )
+            response.stream_to_file(file_name)
+            subprocess.run(["afplay", file_name])
 
 
 class Conversation:
@@ -90,7 +98,7 @@ class Conversation:
         personal_context = npc.background + " " + ". ".join(
             [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
+        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context} Instructions: {self.instructions}"
         return prompt
 
     def add_message(self, npc_name, message):
@@ -108,7 +116,7 @@ class Conversation:
             response = client.messages.create(
                 model=model,
                 max_tokens=1000,
-                temperature=0,
+                temperature=1,
                 system=prompt,
                 messages=[
                     {
@@ -116,7 +124,7 @@ class Conversation:
                         "content": [
                             {
                                 "type": "text",
-                                "text": "How does the character respond? The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open-ended question that invites conversation."
+                                "text": f"Previous Messages:{self.dialogue_history} \n\n~~~~~~~~~~~\n\nHow does the character respond? The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open-ended question that invites conversation."
                             }
                         ]
                     }
@@ -124,7 +132,8 @@ class Conversation:
             )
             message = response.content[0].text.strip()
             self.add_message(npc.name, message)
-            await npc.speak(message)
+            file_name = f"{npc.name}_round_{round_num}_dialogue_{dialogue_num}.mp3"
+            await npc.speak(message, file_name)
         except anthropic.APIError as e:
             logger.error(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
         except Exception as e:
