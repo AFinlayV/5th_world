@@ -4,9 +4,9 @@ import random
 import json
 from pathlib import Path
 from openai import OpenAI
+import asyncio
 
 """
-TODO: Make the text generation and the playing of audio async, so that the playing of audio doesn't stop the text generation
 TODO: Add a way to update the disposition of the characters based on the conversation
 TODO: Make the conversation history persistent
 TODO: Add a way to save the conversation history to a file
@@ -56,7 +56,7 @@ class NPC:
         if isinstance(value, float) and -1 <= value <= 1:
             self.dispositions[topic] = value
 
-    def speak(self, message):
+    async def speak(self, message):
         speech_file_path = Path(__file__).parent / f"{self.name}.mp3"
         response = OpenAI().audio.speech.create(
             model="tts-1",
@@ -84,39 +84,42 @@ class Conversation:
     def add_message(self, npc_name, message):
         self.dialogue_history.append({"character": npc_name, "message": message})
 
-    def conduct_round(self):
-        print(f"Conducting a round of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
-        for npc in self.participants:
-            prompt = self.build_context(npc)
-            try:
-                response = client.messages.create(
-                    model="claude-3-opus-20240229",
-                    max_tokens=1000,
-                    temperature=0,
-                    system=prompt,
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": [
-                                {
-                                    "type": "text",
-                                    "text": "How does the character respond? The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open-ended question that invites conversation."
-                                }
-                            ]
-                        }
-                    ]
-                )
-                message = response.content[0].text.strip()
-            except anthropic.APIError as e:
-                print(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
-                continue
-            except Exception as e:
-                print(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
-                continue
-
+    async def generate_dialogue(self, npc):
+        prompt = self.build_context(npc)
+        try:
+            response = client.messages.create(
+                model="claude-3-opus-20240229",
+                max_tokens=1000,
+                temperature=0,
+                system=prompt,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "How does the character respond? The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open-ended question that invites conversation."
+                            }
+                        ]
+                    }
+                ]
+            )
+            message = response.content[0].text.strip()
             self.add_message(npc.name, message)
             print(f"{npc.name} says: {message}")
-            npc.speak(message)
+            await npc.speak(message)
+        except anthropic.APIError as e:
+            print(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
+        except Exception as e:
+            print(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
+
+    async def conduct_round(self):
+        print(f"Conducting a round of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
+        tasks = []
+        for npc in self.participants:
+            task = asyncio.create_task(self.generate_dialogue(npc))
+            tasks.append(task)
+        await asyncio.gather(*tasks)
 
 
 def load_characters(file_path):
@@ -135,7 +138,7 @@ def load_characters(file_path):
         exit(1)
 
 
-def main():
+async def main():
     global_context = GLOBAL
     local_context = LOCAL
     instructions = INST
@@ -152,7 +155,7 @@ def main():
 
         # Example: Conduct three rounds of dialogue
         for _ in range(3):
-            conversation.conduct_round()
+            await conversation.conduct_round()
 
         # For demonstration, printing the dialogue history
         for entry in conversation.dialogue_history:
@@ -163,4 +166,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
