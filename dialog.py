@@ -88,7 +88,7 @@ class Conversation:
         prompt = self.build_context(npc)
         try:
             response = client.messages.create(
-                model="claude-3-opus-20240229",
+                model="claude-3-haiku-20240229",
                 max_tokens=1000,
                 temperature=0,
                 system=prompt,
