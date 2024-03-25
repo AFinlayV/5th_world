@@ -3,6 +3,7 @@ import os
 import random
 import json
 from pathlib import Path
+from openai import OpenAI
 
 """
 TODO: Make the text generation and the playing of audio async, so that the playing of audio doesn't stop the text generation
@@ -20,6 +21,9 @@ try:
 except anthropic.APIKeyError as e:
     print(f"Error: {e}. Please make sure the ANTHROPIC_API_KEY environment variable is set correctly.")
     exit(1)
+
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+OpenAI.api_key = openai_api_key
 
 def read_file(file_path):
     try:
@@ -54,8 +58,13 @@ class NPC:
 
     def speak(self, message):
         speech_file_path = Path(__file__).parent / f"{self.name}.mp3"
-        # TODO: Implement text-to-speech using the specified voice
-        print(f"Speaking: {message}")
+        response = OpenAI().audio.speech.create(
+            model="tts-1",
+            voice=self.voice,
+            input=message
+        )
+        response.stream_to_file(speech_file_path)
+        os.system(f"mpg123 -q {speech_file_path}")
 
 
 class Conversation:
@@ -69,7 +78,7 @@ class Conversation:
     def build_context(self, npc):
         personal_context = npc.background + " " + ". ".join([f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages} The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open ended question that invites conversation"
+        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
         return prompt
 
     def add_message(self, npc_name, message):
@@ -80,7 +89,7 @@ class Conversation:
         for npc in self.participants:
             prompt = self.build_context(npc)
             try:
-                message = client.messages.create(
+                response = client.messages.create(
                     model="claude-3-opus-20240229",
                     max_tokens=1000,
                     temperature=0,
@@ -96,7 +105,8 @@ class Conversation:
                             ]
                         }
                     ]
-                ).content
+                )
+                message = response.content[0].text.strip()
             except anthropic.APIError as e:
                 print(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
                 continue
