@@ -25,6 +25,7 @@ except anthropic.APIKeyError as e:
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 OpenAI.api_key = openai_api_key
 
+
 def read_file(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -36,6 +37,7 @@ def read_file(file_path):
         print(f"Error: {e}. An error occurred while reading the file '{file_path}'.")
         exit(1)
 
+
 try:
     GLOBAL = read_file('global_context.txt')
     LOCAL = read_file('local_context.txt')
@@ -43,6 +45,7 @@ try:
 except Exception as e:
     print(f"Error: {e}")
     exit(1)
+
 
 class NPC:
     def __init__(self, name, model, voice, dispositions, background):
@@ -76,7 +79,8 @@ class Conversation:
         self.dialogue_history = []
 
     def build_context(self, npc):
-        personal_context = npc.background + " " + ". ".join([f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
+        personal_context = npc.background + " " + ". ".join(
+            [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
         prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
         return prompt
@@ -88,7 +92,7 @@ class Conversation:
         prompt = self.build_context(npc)
         try:
             response = client.messages.create(
-                model="claude-3-haiku-20240229",
+                model="claude-3-opus-20240229",
                 max_tokens=1000,
                 temperature=0,
                 system=prompt,
@@ -106,8 +110,7 @@ class Conversation:
             )
             message = response.content[0].text.strip()
             self.add_message(npc.name, message)
-            print(f"{npc.name} says: {message}")
-            await npc.speak(message)
+            return message
         except anthropic.APIError as e:
             print(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
         except Exception as e:
@@ -115,11 +118,17 @@ class Conversation:
 
     async def conduct_round(self):
         print(f"Conducting a round of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
-        tasks = []
+        dialogue_tasks = []
         for npc in self.participants:
-            task = asyncio.create_task(self.generate_dialogue(npc))
-            tasks.append(task)
-        await asyncio.gather(*tasks)
+            dialogue_task = asyncio.create_task(self.generate_dialogue(npc))
+            dialogue_tasks.append(dialogue_task)
+
+        dialogues = await asyncio.gather(*dialogue_tasks)
+
+        for npc, dialogue in zip(self.participants, dialogues):
+            if dialogue:
+                print(f"{npc.name} says: {dialogue}")
+                await npc.speak(dialogue)
 
 
 def load_characters(file_path):
