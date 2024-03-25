@@ -7,6 +7,7 @@ import asyncio
 import logging
 import subprocess
 from openai import OpenAI
+import re
 
 """
 TODO: Add a way to update the disposition of the characters based on the conversation
@@ -26,7 +27,7 @@ logger = logging.getLogger(__name__)
 verbose = True
 
 # Dev mode setting
-dev_mode = True
+dev_mode = False
 
 try:
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
@@ -58,8 +59,8 @@ except Exception as e:
     logger.error(f"Error: {e}")
     exit(1)
 
-# List of available voices in dev mode
-dev_voices = ["Alex", "Daniel", "Fred", "Karen", "Moira", "Rishi", "Samantha", "Tessa", "Veena", "Victoria"]
+# List of available voices on macOS
+dev_voices = ["Alex", "Daniel", "Fiona", "Fred", "Karen", "Moira", "Rishi", "Samantha", "Tessa", "Veena", "Victoria"]
 
 
 class NPC:
@@ -70,13 +71,26 @@ class NPC:
         self.dispositions = dispositions
         self.background = background
         if dev_mode:
-            self.voice = random.choice(dev_voices)
+            self.voice = self.select_voice()
+
+    def select_voice(self):
+        while True:
+            voice = random.choice(dev_voices)
+            try:
+                subprocess.run(["say", "-v", voice, "Testing the voice"], stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL)
+                return voice
+            except subprocess.CalledProcessError:
+                logger.warning(f"Voice '{voice}' not found. Selecting a different voice.")
 
     def update_disposition(self, topic, value):
         if isinstance(value, float) and -1 <= value <= 1:
             self.dispositions[topic] = value
 
     async def speak(self, message, file_name):
+        # Remove text between asterisks (**) or brackets ([])
+        message = re.sub(r'\*.*?\*|\[.*?\]', '', message)
+
         if verbose:
             logger.info(f"Speaking for {self.name}: {message}")
         if dev_mode:
@@ -128,7 +142,7 @@ class Conversation:
                         "content": [
                             {
                                 "type": "text",
-                                "text": f"Previous Messages:{self.dialogue_history} \n\n~~~~~~~~~~~\n\nHow does the character respond? The output should strictly contain only the character's spoken dialogue as it would be said aloud, NO stage directions, NO additional information,  NO special formatting and should end with an open-ended question that invites conversation."
+                                "text": f"Previous Messages:{self.dialogue_history} \n\n~~~~~~~~~~~\n\nHow does the character respond? The output should strictly contain only the character's spoken dialogue, with NO stage directions, NO additional information, and NO special formatting. It should end with an open-ended question that invites conversation."
                             }
                         ]
                     }
