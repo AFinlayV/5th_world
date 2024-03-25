@@ -67,8 +67,7 @@ class NPC:
         if isinstance(value, float) and -1 <= value <= 1:
             self.dispositions[topic] = value
 
-    async def speak(self, message):
-        speech_file_path = Path(__file__).parent / f"{self.name}.mp3"
+    async def generate_speech(self, message, file_name):
         if verbose:
             logger.info(f"Generating speech for {self.name}: {message}")
         response = OpenAI().audio.speech.create(
@@ -76,10 +75,7 @@ class NPC:
             voice=self.voice,
             input=message
         )
-        response.stream_to_file(speech_file_path)
-        if verbose:
-            logger.info(f"Playing speech for {self.name}")
-        os.system(f"mpg123 -q {speech_file_path}")
+        response.stream_to_file(file_name)
 
 
 class Conversation:
@@ -94,13 +90,13 @@ class Conversation:
         personal_context = npc.background + " " + ". ".join(
             [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages} The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open ended question that invites conversation"
+        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
         return prompt
 
     def add_message(self, npc_name, message):
         self.dialogue_history.append({"character": npc_name, "message": message})
 
-    async def generate_dialogue(self, npc):
+    async def generate_dialogue(self, npc, round_num, dialogue_num):
         prompt = self.build_context(npc)
         try:
             if verbose:
@@ -124,27 +120,30 @@ class Conversation:
             )
             message = response.content[0].text.strip()
             self.add_message(npc.name, message)
-            return message
+            file_name = f"{npc.name}_round_{round_num}_dialogue_{dialogue_num}.mp3"
+            await npc.generate_speech(message, file_name)
+            return file_name
         except anthropic.APIError as e:
             logger.error(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
         except Exception as e:
             logger.error(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
 
-    async def conduct_round(self):
+    async def conduct_round(self, round_num):
         if verbose:
             logger.info(
-                f"Conducting a round of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
+                f"Conducting round {round_num} of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
         dialogue_tasks = []
-        for npc in self.participants:
-            dialogue_task = asyncio.create_task(self.generate_dialogue(npc))
+        for i, npc in enumerate(self.participants):
+            dialogue_task = asyncio.create_task(self.generate_dialogue(npc, round_num, i + 1))
             dialogue_tasks.append(dialogue_task)
 
-        dialogues = await asyncio.gather(*dialogue_tasks)
+        file_names = await asyncio.gather(*dialogue_tasks)
 
-        for npc, dialogue in zip(self.participants, dialogues):
-            if dialogue:
-                logger.info(f"{npc.name} says: {dialogue}")
-                await npc.speak(dialogue)
+        for file_name in file_names:
+            if file_name:
+                if verbose:
+                    logger.info(f"Playing speech file: {file_name}")
+                os.system(f"mpg123 -q {file_name}")
 
 
 def load_characters(file_path):
@@ -179,8 +178,8 @@ async def main():
         conversation = Conversation(npcs, global_context, local_context, instructions)
 
         # Example: Conduct three rounds of dialogue
-        for _ in range(3):
-            await conversation.conduct_round()
+        for round_num in range(1, 4):
+            await conversation.conduct_round(round_num)
 
         # For demonstration, printing the dialogue history
         logger.info("Dialogue history:")
