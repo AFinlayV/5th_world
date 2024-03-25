@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from openai import OpenAI
 import asyncio
+import logging
 
 """
 TODO: Add a way to update the disposition of the characters based on the conversation
@@ -16,10 +17,17 @@ TODO: Add a way to save the conversation to a file (json?)
 TODO: Add a way to load a conversation from a file (json?)
 """
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Verbose setting
+verbose = True
+
 try:
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 except anthropic.APIKeyError as e:
-    print(f"Error: {e}. Please make sure the ANTHROPIC_API_KEY environment variable is set correctly.")
+    logger.error(f"Error: {e}. Please make sure the ANTHROPIC_API_KEY environment variable is set correctly.")
     exit(1)
 
 openai_api_key = os.environ.get("OPENAI_API_KEY")
@@ -31,10 +39,10 @@ def read_file(file_path):
         with open(file_path, 'r') as file:
             return file.read()
     except FileNotFoundError as e:
-        print(f"Error: {e}. Please make sure the file '{file_path}' exists.")
+        logger.error(f"Error: {e}. Please make sure the file '{file_path}' exists.")
         exit(1)
     except IOError as e:
-        print(f"Error: {e}. An error occurred while reading the file '{file_path}'.")
+        logger.error(f"Error: {e}. An error occurred while reading the file '{file_path}'.")
         exit(1)
 
 
@@ -43,7 +51,7 @@ try:
     LOCAL = read_file('local_context.txt')
     INST = read_file('instructions.txt')
 except Exception as e:
-    print(f"Error: {e}")
+    logger.error(f"Error: {e}")
     exit(1)
 
 
@@ -61,12 +69,16 @@ class NPC:
 
     async def speak(self, message):
         speech_file_path = Path(__file__).parent / f"{self.name}.mp3"
+        if verbose:
+            logger.info(f"Generating speech for {self.name}: {message}")
         response = OpenAI().audio.speech.create(
             model="tts-1",
             voice=self.voice,
             input=message
         )
         response.stream_to_file(speech_file_path)
+        if verbose:
+            logger.info(f"Playing speech for {self.name}")
         os.system(f"mpg123 -q {speech_file_path}")
 
 
@@ -82,7 +94,7 @@ class Conversation:
         personal_context = npc.background + " " + ". ".join(
             [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
+        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages} The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open ended question that invites conversation"
         return prompt
 
     def add_message(self, npc_name, message):
@@ -91,6 +103,8 @@ class Conversation:
     async def generate_dialogue(self, npc):
         prompt = self.build_context(npc)
         try:
+            if verbose:
+                logger.info(f"Generating dialogue for {npc.name}")
             response = client.messages.create(
                 model="claude-3-opus-20240229",
                 max_tokens=1000,
@@ -112,12 +126,14 @@ class Conversation:
             self.add_message(npc.name, message)
             return message
         except anthropic.APIError as e:
-            print(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
+            logger.error(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
         except Exception as e:
-            print(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
+            logger.error(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
 
     async def conduct_round(self):
-        print(f"Conducting a round of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
+        if verbose:
+            logger.info(
+                f"Conducting a round of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
         dialogue_tasks = []
         for npc in self.participants:
             dialogue_task = asyncio.create_task(self.generate_dialogue(npc))
@@ -127,7 +143,7 @@ class Conversation:
 
         for npc, dialogue in zip(self.participants, dialogues):
             if dialogue:
-                print(f"{npc.name} says: {dialogue}")
+                logger.info(f"{npc.name} says: {dialogue}")
                 await npc.speak(dialogue)
 
 
@@ -137,13 +153,13 @@ def load_characters(file_path):
             characters_data = json.load(file)
         return characters_data
     except FileNotFoundError as e:
-        print(f"Error: {e}. Please make sure the file '{file_path}' exists.")
+        logger.error(f"Error: {e}. Please make sure the file '{file_path}' exists.")
         exit(1)
     except json.JSONDecodeError as e:
-        print(f"Error: {e}. The file '{file_path}' contains invalid JSON.")
+        logger.error(f"Error: {e}. The file '{file_path}' contains invalid JSON.")
         exit(1)
     except IOError as e:
-        print(f"Error: {e}. An error occurred while reading the file '{file_path}'.")
+        logger.error(f"Error: {e}. An error occurred while reading the file '{file_path}'.")
         exit(1)
 
 
@@ -167,11 +183,12 @@ async def main():
             await conversation.conduct_round()
 
         # For demonstration, printing the dialogue history
+        logger.info("Dialogue history:")
         for entry in conversation.dialogue_history:
-            print(f"{entry['character']} said: {entry['message']}")
+            logger.info(f"{entry['character']}: {entry['message']}")
 
     except Exception as e:
-        print(f"Error: {e}. An unexpected error occurred.")
+        logger.error(f"Error: {e}. An unexpected error occurred.")
 
 
 if __name__ == "__main__":
