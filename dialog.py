@@ -58,6 +58,9 @@ except Exception as e:
     logger.error(f"Error: {e}")
     exit(1)
 
+# List of available voices in dev mode
+dev_voices = ["Alex", "Daniel", "Fred", "Karen", "Moira", "Rishi", "Samantha", "Tessa", "Veena", "Victoria"]
+
 
 class NPC:
     def __init__(self, name, model, voice, dispositions, background):
@@ -66,6 +69,8 @@ class NPC:
         self.voice = voice
         self.dispositions = dispositions
         self.background = background
+        if dev_mode:
+            self.voice = random.choice(dev_voices)
 
     def update_disposition(self, topic, value):
         if isinstance(value, float) and -1 <= value <= 1:
@@ -75,7 +80,7 @@ class NPC:
         if verbose:
             logger.info(f"Speaking for {self.name}: {message}")
         if dev_mode:
-            subprocess.run(["say", message])
+            subprocess.run(["say", "-v", self.voice, message])
         else:
             response = OpenAI().audio.speech.create(
                 model="tts-1",
@@ -97,7 +102,6 @@ class Conversation:
     def build_context(self, npc):
         personal_context = npc.background + " " + ". ".join(
             [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
-        previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
         prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context} Instructions: {self.instructions}"
         return prompt
 
@@ -124,7 +128,7 @@ class Conversation:
                         "content": [
                             {
                                 "type": "text",
-                                "text": f"Previous Messages:{self.dialogue_history} \n\n~~~~~~~~~~~\n\nHow does the character respond? The output should strictly contain only the character's spoken dialogue, without any stage directions, additional information, or special formatting and should end with an open-ended question that invites conversation."
+                                "text": f"Previous Messages:{self.dialogue_history} \n\n~~~~~~~~~~~\n\nHow does the character respond? The output should strictly contain only the character's spoken dialogue as it would be said aloud, NO stage directions, NO additional information,  NO special formatting and should end with an open-ended question that invites conversation."
                             }
                         ]
                     }
