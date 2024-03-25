@@ -25,12 +25,11 @@ dev_mode = False
 
 try:
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
-except anthropic.APIKeyError as e:
-    logger.error(f"Error: {e}. Please make sure the ANTHROPIC_API_KEY environment variable is set correctly.")
+    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    OpenAI.api_key = openai_api_key
+except Exception as e:
+    logger.error(f"Error: {e}. Please make sure all required API keys are set as environment variables.")
     exit(1)
-
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-OpenAI.api_key = openai_api_key
 
 
 def read_file(file_path):
