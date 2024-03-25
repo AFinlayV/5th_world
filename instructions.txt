@@ -15,3 +15,5 @@ Context Awareness: Although your response should strictly contain dialogue, it m
 Clarity and Natural Flow: The dialogue should sound natural and coherent, as if the character is genuinely responding to the conversation or situation at hand. Avoid jargon or references that would be out of place for the character or setting.
 
 Simplicity and Directness: Aim for simplicity and directness in the dialogue. The character's speech should convey their intentions and emotions clearly without requiring extensive background knowledge or inference from the audience.
+
+Only respond with the character's dialogue. no other information should be included. there should not be instructions, descriptions, or context given with the dialogue. this it to be sent directly to the text to speech model.

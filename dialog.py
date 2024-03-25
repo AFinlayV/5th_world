@@ -3,9 +3,9 @@ import os
 import random
 import json
 from pathlib import Path
-from openai import OpenAI
 import asyncio
 import logging
+import subprocess
 
 """
 TODO: Add a way to update the disposition of the characters based on the conversation
@@ -24,14 +24,14 @@ logger = logging.getLogger(__name__)
 # Verbose setting
 verbose = True
 
+# Dev mode setting
+dev_mode = False
+
 try:
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 except anthropic.APIKeyError as e:
     logger.error(f"Error: {e}. Please make sure the ANTHROPIC_API_KEY environment variable is set correctly.")
     exit(1)
-
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-OpenAI.api_key = openai_api_key
 
 
 def read_file(file_path):
@@ -70,12 +70,12 @@ class NPC:
     async def generate_speech(self, message, file_name):
         if verbose:
             logger.info(f"Generating speech for {self.name}: {message}")
-        response = OpenAI().audio.speech.create(
-            model="tts-1",
-            voice=self.voice,
-            input=message
-        )
-        response.stream_to_file(file_name)
+        if dev_mode:
+            subprocess.run(["say", "-o", file_name, message])
+        else:
+            # Use OpenAI's text-to-speech API in production mode
+            # (Code for OpenAI's text-to-speech API goes here)
+            pass
 
 
 class Conversation:
@@ -90,7 +90,7 @@ class Conversation:
         personal_context = npc.background + " " + ". ".join(
             [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
         previous_messages = " ".join([f"{msg['character']} said: {msg['message']}" for msg in self.dialogue_history])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages}"
+        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context}. Previous Messages: {previous_messages} Instructions:{self.instructions}"
         return prompt
 
     def add_message(self, npc_name, message):
@@ -101,8 +101,12 @@ class Conversation:
         try:
             if verbose:
                 logger.info(f"Generating dialogue for {npc.name}")
+            if dev_mode:
+                model = "claude-3-haiku-20240307"
+            else:
+                model = "claude-3-opus-20240229"
             response = client.messages.create(
-                model="claude-3-opus-20240229",
+                model=model,
                 max_tokens=1000,
                 temperature=0,
                 system=prompt,
@@ -143,7 +147,7 @@ class Conversation:
             if file_name:
                 if verbose:
                     logger.info(f"Playing speech file: {file_name}")
-                os.system(f"mpg123 -q {file_name}")
+                subprocess.run(["afplay", file_name])
 
 
 def load_characters(file_path):
