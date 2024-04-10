@@ -150,16 +150,58 @@ class Conversation:
         except Exception as e:
             logger.error(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
 
-    async def conduct_round(self, round_num):
+    async def conduct_round(self, round_num, bartender_interjection):
         if verbose:
             logger.info(
                 f"Conducting round {round_num} of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
+
+        # Add bartender's interjection to the dialogue history
+        self.add_message("Bartender", bartender_interjection)
+
+        # Update character dispositions based on bartender's interjection
+        await self.update_dispositions(bartender_interjection)
+
         dialogue_tasks = []
         for i, npc in enumerate(self.participants):
             dialogue_task = asyncio.create_task(self.generate_dialogue(npc, round_num, i + 1))
             dialogue_tasks.append(dialogue_task)
 
         await asyncio.gather(*dialogue_tasks)
+
+    async def update_dispositions(self, bartender_interjection):
+        prompt = f"Bartender's interjection: {bartender_interjection}\n\nBased on the bartender's interjection, how does it affect each character's disposition towards different topics? Provide the updates in the following format:\n\nCharacter1:\nTopic1: DispositionChange\nTopic2: DispositionChange\n...\n\nCharacter2:\nTopic1: DispositionChange\nTopic2: DispositionChange\n...\n\nCharacter3:\nTopic1: DispositionChange\nTopic2: DispositionChange\n..."
+
+        response = client.messages.create(
+            model="claude-3-opus-20240229",
+            max_tokens=1000,
+            temperature=1,
+            system=prompt,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Please provide the disposition updates for each character based on the bartender's interjection."
+                        }
+                    ]
+                }
+            ]
+        )
+
+        disposition_updates = response.content[0].text.strip()
+
+        for update in disposition_updates.split("\n\n"):
+            character_name, *topic_updates = update.split(":\n")
+            character_name = character_name.strip()
+
+            for npc in self.participants:
+                if npc.name == character_name:
+                    for topic_update in topic_updates:
+                        topic, disposition_change = topic_update.split(":")
+                        topic = topic.strip()
+                        disposition_change = float(disposition_change.strip())
+                        npc.update_disposition(topic, disposition_change)
 
 
 def load_characters(file_path):
@@ -193,9 +235,10 @@ async def main():
 
         conversation = Conversation(npcs, global_context, local_context, instructions)
 
-        # Example: Conduct three rounds of dialogue
+        # Example: Conduct three rounds of dialogue with bartender interjections
         for round_num in range(1, 4):
-            await conversation.conduct_round(round_num)
+            bartender_interjection = input(f"Bartender's interjection for round {round_num}: ")
+            await conversation.conduct_round(round_num, bartender_interjection)
 
         # For demonstration, printing the dialogue history
         logger.info("Dialogue history:")

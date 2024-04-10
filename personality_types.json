@@ -1,0 +1,22 @@
+[
+  {
+    "name": "The Visionary",
+    "description": "Innovative, creative, and always looking towards the future."
+  },
+  {
+    "name": "The Pragmatist",
+    "description": "Practical, efficient, and focused on getting things done."
+  },
+  {
+    "name": "The Empathizer",
+    "description": "Compassionate, understanding, and attuned to the needs of others."
+  },
+  {
+    "name": "The Challenger",
+    "description": "Bold, assertive, and unafraid to question the status quo."
+  },
+  {
+    "name": "The Mediator",
+    "description": "Diplomatic, level-headed, and skilled at finding common ground."
+  }
+]

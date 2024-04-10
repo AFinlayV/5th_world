@@ -1,0 +1,22 @@
+[
+  {
+    "name": "The Core",
+    "description": "The central ring of the station, housing the Nexus and the seat of power."
+  },
+  {
+    "name": "The Horizon",
+    "description": "The outermost ring, known for its stunning views of the cosmos and its adventurous inhabitants."
+  },
+  {
+    "name": "The Meridian",
+    "description": "The middle ring, a hub of commerce, entertainment, and social interaction."
+  },
+  {
+    "name": "The Genesis",
+    "description": "The ring responsible for food production, agriculture, and environmental sustainability."
+  },
+  {
+    "name": "The Crucible",
+    "description": "The ring focused on industrial manufacturing, resource processing, and technological development."
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "The Nexus Engineers",
+    "description": "A guild specializing in the design, construction, and maintenance of the station's infrastructure and technology."
+  },
+  {
+    "name": "The Cosmic Artisans",
+    "description": "A guild devoted to creating art, entertainment, and experiences that enrich the lives of the station's inhabitants."
+  },
+  {
+    "name": "The Astro-Medics",
+    "description": "A guild focused on providing healthcare, medical research, and ensuring the well-being of the population."
+  },
+  {
+    "name": "The Interstellar Merchants",
+    "description": "A guild engaged in trade, commerce, and the exchange of goods and services throughout the station."
+  },
+  {
+    "name": "The Void Seekers",
+    "description": "A guild dedicated to exploration, discovery, and uncovering the mysteries of the universe."
+  }
+]

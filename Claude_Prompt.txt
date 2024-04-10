@@ -1,0 +1,78 @@
+import anthropic
+
+client = anthropic.Anthropic(
+    # defaults to os.environ.get("ANTHROPIC_API_KEY")
+    api_key="my_api_key",
+)
+message = client.messages.create(
+    model="claude-3-opus-20240229",
+    max_tokens=1000,
+    temperature=0,
+    system="The Year is 3150. 5th World is a space station located in the asteroid belt. This station is massive and houses many billions of people across 5 spinning rings that spin around a central fusion core. The core is a synthetic fusion reaction that produces both matter and energy in quantities that were previously unthinkable. It can create any amount of any kind of element through the rings. Each ring transmutes the output of the reactor from one form into another. \n\nThe central reaction produces what the station inhabitants call \"quantum foam\" it is a form of undifferentiated [Mater+Energy]. This is transmitted to the first ring. The first ring transmutes the quantum foam into blocks of pure elements. each block is brick sized and enclosed in a force field. The culture on the first ring is steeped in academia, and high minded persuits and it is also the seat of governance in the station. \n\nThese bricks are sent to the second ring which processes the raw elements into usable manufactured goods, The second ring has a culture of industriousness and engineering. it has a focus on practicality and pragmatism.\n\nThe products of the second ring are sent to the 3rd ring, which houses most of the people that life on 5th world. They live in what is effectively a post scarcity society. no one has to work and everyone lives normal lives doing as they please and working on projects as they like. many of the people here are designers and curators of collections.\n\nthe 4th ring features the artists and musicians and creatives. it is a wild culture where boundaries are more fluid and all definitions can be questioned. They are know for very ambitious art projects like moon sized sculptures and 10000 person orchestras\n\nthe 5th and outer ring is focused on efficiency it is the shipping logistics center as well as defense. it acts as a port and a military base, keeping the station safe.\n\nthis station is the setting for a RPG where they player is a bartending robot, and is serving customers. ",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Welcome back BarBot\n\nPlease select from the options below:\n1. Order Supplies\n2. Lookup World Info\n3. See Menu\n\n>3"
+                }
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Here is the current menu for BarBot's Bar & Lounge on Ring 3 of 5th World Station:\n\nCocktails:\n- Quantum Fizz: A sparkling cocktail that shifts flavor with each sip \n- Gravity Well: A swirling galaxy of liqueurs in a black hole martini glass\n- Cosmic Ray: Vibrant layers of liquor that glow under UV light\n- Singularity Shot: An intense, dense shot that packs a punch\n- Wormhole: A tunnel of colorful spirits that transports you to another dimension\n\nBeers & Ciders:\n- Supernova IPA: A stellar fusion of hops \n- Red Dwarf Ale: Malty, rich and compact in a small pour\n- Pulsar Pilsner: Crisp, bright and refreshing with pulsing effervescence \n- Nebula Nitro Stout: Velvety, dark and swirling with creamy nitrogen bubbles\n- Asteroid Cider: Tart, dry apple cider fermented with meteorite dust\n\nWines:\n- Stardust Chardonnay: Elegant, oaked white with notes of starfruit and comet tail\n- Dark Matter Malbec: Inky purple, full-bodied red with intense black hole fruits \n- Supergiant Syrah: Massive, complex red with flavors that collapse into spice and pepper\n- Rosé Quasar: Explosive pink wine bursting with bright radiation of berries\n\nLiquors & Spirits:\n- Moonshine Vodka: Clear, pure spirit distilled from lunar potatoes\n- Kuiper Belt Bourbon: Barrel-aged whiskey, as smooth as ice\n- Io Gin: Juniper spirit infused with sulfuric essences of Jupiter's moon\n- Titan Tequila: Earthy, vegetal tequila with the strength of Saturn's largest moon\n- Oort Cloud Ouzo: Anise aperitif as hazy and mysterious as the solar system's edge\n\nSelect Option:\n\n1. See Recipes\n2. Back"
+                }
+            ]
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "1"
+                }
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Here are the recipes for some of BarBot's signature cocktails:\n\nQuantum Fizz:\n- 1.5 oz Moonshine Vodka \n- 0.5 oz Io Gin\n- 0.5 oz simple syrup\n- 0.5 oz lemon juice\n- 2 oz seltzer water\n- Garnish: Lemon twist\nInstructions: Shake vodka, gin, syrup and juice with ice. Strain into a chilled glass. Top with seltzer. Garnish with lemon twist. Observe the flavor shifting with each sip due to quantum entanglement.\n\nGravity Well:\n- 1 oz Kuiper Belt Bourbon \n- 1 oz Titan Tequila\n- 0.5 oz Dark Matter Malbec\n- 0.5 oz lime juice\n- 0.25 oz simple syrup \n- Garnish: Lime wheel\nInstructions: Layer bourbon, tequila, wine, lime and syrup in a black hole martini glass. Do not stir - the intense gravity will draw the layers together. Garnish with lime balanced on the event horizon.\n\nCosmic Ray:\n- 1.5 oz Oort Cloud Ouzo\n- 0.5 oz Moonshine Vodka\n- 0.5 oz Supernova IPA\n- 0.5 oz pineapple juice\n- 0.5 oz UV-reactive syrup\n- Garnish: Pineapple leaf\nInstructions: Shake ouzo, vodka, beer, juice and syrup with ice. Strain into a tall glass over fresh ice. Garnish with pineapple leaf. Charge the drink with a UV light wand to make it glow.\n\nSelect Option:  \n1. See More Recipes\n2. Back"
+                }
+            ]
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "2"
+                }
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Please select from the options below:\n\n1. Order Supplies\n2. Lookup World Info  \n3. See Menu\n\n>"
+                }
+            ]
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "2"
+                }
+            ]
+        }
+    ]
+)
+print(message.content)
