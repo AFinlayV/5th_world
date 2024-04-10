@@ -1,0 +1,47 @@
+[
+  {
+    "character": "Kai",
+    "message": "*sips drink, surveying the cantina* Ah, the Cosmos Cantina. Where the drinks flow as freely as the deals. Speaking of which, I hear you're looking to secure some rare tylium ore for your fleet. I might know a supplier, for the right price of course. But tell me, what brings an esteemed commander like yourself to our humble station?",
+    "timestamp": "2024-04-10 14:23:39"
+  },
+  {
+    "character": "Gia",
+    "message": "*chuckles* You're well-informed, Kai. I'm here to keep my fleet fueled and ready for anything. Tylium's not easy to come by these days, so I'm willing to pay a fair price for a steady supply. But I've learned not to trust easily in this business. How can I be sure your supplier is reliable?",
+    "timestamp": "2024-04-10 14:23:48"
+  },
+  {
+    "character": "Holt",
+    "message": "\"Ah, trust is a valuable commodity in these parts, Commander. As rare and precious as tylium itself. My supplier has never let me down, but I understand your caution. Perhaps we could start with a small shipment, a taste of what's to come, before we commit to a long-term arrangement. What kind of quantities are you looking for, if you don't mind me asking?\"",
+    "timestamp": "2024-04-10 14:23:57"
+  },
+  {
+    "character": "Kai",
+    "message": "\"A small shipment to start could work. We're looking at needing around 500 metric tons per month to keep our fleet running smoothly. Of course, if your supplier proves reliable, we'd be interested in increasing that amount. What kind of timeframe are we looking at for delivery, and how do you propose we handle the payment?\"",
+    "timestamp": "2024-04-10 14:25:52"
+  },
+  {
+    "character": "Gia",
+    "message": "\"500 metric tons per month is a tall order, but not impossible. For a shipment that size, we're looking at a delivery window of about a week, give or take a day or two depending on the routes. As for payment, I prefer to keep things simple and discreet. An initial deposit to secure the shipment, with the balance due upon delivery. I assume you have experience with encrypted credit transfers? How does a 30% upfront deposit sound to you?\"",
+    "timestamp": "2024-04-10 14:26:01"
+  },
+  {
+    "character": "Holt",
+    "message": "\"30% upfront seems reasonable, given the quantities we're discussing. I can have my finance team set up a secure, encrypted transfer within the next business day. Now, about this initial shipment - I'm thinking we start with 100 metric tons, just to ensure the quality meets our standards. If all goes well, we can ramp up to the full 500 per month. What do you say to having that first delivery here within the next two weeks?\"",
+    "timestamp": "2024-04-10 14:26:13"
+  },
+  {
+    "character": "Kai",
+    "message": "\"Two weeks for the first shipment is doable. I'll put my best crew on it to ensure a smooth delivery. 100 metric tons is a good starting point - it'll give you a chance to test the quality and see that we're serious about this partnership. I'll send over the account details for the deposit transfer once I'm back at my office. \n\nNow, I'm curious - what kind of fleet are you running that needs this much tylium? Must be quite an operation you've got going on out there.\"",
+    "timestamp": "2024-04-10 14:28:56"
+  },
+  {
+    "character": "Gia",
+    "message": "\"Let's just say our fleet is substantial and leave it at that for now. In my line of work, discretion is key. The less said over drinks, the better. \n\nI'll have my team keep an eye out for that deposit and start prepping the shipment once it clears. Sounds like we've got a deal in the works.\n\nSo tell me, Kai, how'd you get into this business anyway? I'm always curious to hear the stories behind the suppliers I work with.\"",
+    "timestamp": "2024-04-10 14:29:07"
+  },
+  {
+    "character": "Holt",
+    "message": "\"Ah, you know how it is, Gia. One day you're a young buck with stars in your eyes, dreaming of adventure in the great beyond. Next thing you know, you're knee-deep in the tylium trade, wheeling and dealing across the galaxy. It's a wild ride, but I wouldn't trade it for anything. The thrill of the deal, the rush of a successful shipment - there's nothing quite like it. \n\nBut enough about me, I want to hear more about you. What's the most exciting corner of the universe your fleet has explored?\"",
+    "timestamp": "2024-04-10 14:29:17"
+  }
+]

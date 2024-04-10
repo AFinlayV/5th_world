@@ -10,9 +10,6 @@ from openai import OpenAI
 import re
 import argparse
 import datetime
-import io
-from pydub import AudioSegment
-from pydub.playback import play
 
 """
 This script demonstrates how to use the Anthropic API to generate dialogue between NPCs in a conversational setting.
@@ -86,22 +83,21 @@ class NPC:
         if isinstance(value, float) and -1 <= value <= 1:
             self.dispositions[topic] = value
 
-    async def speak(self, message):
+    async def speak(self, message, file_name):
         # Remove text between asterisks (**) or brackets ([])
         message = re.sub(r'\*.*?\*|\[.*?\]', '', message)
         if verbose:
             logger.info(f"Speaking for {self.name}: {message}")
         if dev_mode:
-            audio_data = subprocess.check_output(["say", "-v", self.voice, message])
+            subprocess.run(["say", "-v", self.voice, message])
         else:
             response = OpenAI().audio.speech.create(
                 model="tts-1",
                 voice=self.voice,
                 input=message
             )
-            audio_data = response.read()
-        audio_segment = AudioSegment.from_file(io.BytesIO(audio_data), format="mp3")
-        return audio_segment
+            response.stream_to_file(file_name)
+            subprocess.run(["afplay", file_name])
 
 class Conversation:
     def __init__(self, participants, global_context, local_context, instructions):
@@ -112,95 +108,77 @@ class Conversation:
         self.dialogue_history = []
         self.round_dialogues = []
 
-    def build_context(self, npc):
-        personal_context = npc.background + " " + ". ".join(
-            [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
-        prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context} Instructions: {self.instructions}"
-        return prompt
+def build_context(self, npc):
+    personal_context = npc.background + " " + ". ".join(
+        [f"{topic} disposition: {score}" for topic, score in npc.dispositions.items()])
+    prompt = f"{self.instructions} Global Context: {self.global_context}. Personal Context: {personal_context}. Local Context: {self.local_context} Instructions: {self.instructions}"
+    return prompt
 
-    def add_message(self, npc_name, message):
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.dialogue_history.append({"character": npc_name, "message": message, "timestamp": timestamp})
+def add_message(self, npc_name, message):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    self.dialogue_history.append({"character": npc_name, "message": message, "timestamp": timestamp})
 
-    async def generate_dialogue(self, npc, round_num, dialogue_num):
-        prompt = self.build_context(npc)
-        try:
-            if verbose:
-                logger.info(f"Generating dialogue for {npc.name}")
-            if dev_mode:
-                model = "claude-3-haiku-20240307"
-            else:
-                model = "claude-3-opus-20240229"
-            response = client.messages.create(
-                model=model,
-                max_tokens=1000,
-                temperature=1,
-                system=prompt,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": f"Previous Messages:{self.dialogue_history} \n\n~~~~~~~~~~~\n\nHow does the character respond? The output should strictly contain only the character's spoken dialogue, with NO stage directions, NO additional information, and NO special formatting. It should end with an open-ended question that invites conversation."
-                            }
-                        ]
-                    }
-                ]
-            )
-            message = response.content[0].text.strip()
-            self.add_message(npc.name, message)
-            self.round_dialogues.append((npc, message))
-        except anthropic.APIError as e:
-            logger.error(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
-        except Exception as e:
-            logger.error(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
-
-    async def generate_audio(self, round_num):
-        audio_tasks = []
-        for i, (npc, message) in enumerate(self.round_dialogues):
-            audio_task = asyncio.create_task(npc.speak(message))
-            audio_tasks.append(audio_task)
-        audio_segments = await asyncio.gather(*audio_tasks)
-        combined_audio = AudioSegment.empty()
-        for audio_segment in audio_segments:
-            combined_audio += audio_segment
-        return combined_audio
-
-    async def play_audio(self, audio_segment):
-        play(audio_segment)
-
-    async def conduct_round(self, round_num):
+async def generate_dialogue(self, npc, round_num, dialogue_num):
+    prompt = self.build_context(npc)
+    try:
         if verbose:
-            logger.info(
-                f"Conducting round {round_num} of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
+            logger.info(f"Generating dialogue for {npc.name}")
+        if dev_mode:
+            model = "claude-3-haiku-20240307"
+        else:
+            model = "claude-3-opus-20240229"
+        response = client.messages.create(
+            model=model,
+            max_tokens=1000,
+            temperature=1,
+            system=prompt,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"Previous Messages:{self.dialogue_history} \n\n~~~~~~~~~~~\n\nHow does the character respond? The output should strictly contain only the character's spoken dialogue, with NO stage directions, NO additional information, and NO special formatting. It should end with an open-ended question that invites conversation."
+                        }
+                    ]
+                }
+            ]
+        )
+        message = response.content[0].text.strip()
+        self.add_message(npc.name, message)
+        self.round_dialogues.append((npc, message))
+    except anthropic.APIError as e:
+        logger.error(f"Error: {e}. An error occurred while generating dialogue for {npc.name}.")
+    except Exception as e:
+        logger.error(f"Error: {e}. An unexpected error occurred while generating dialogue for {npc.name}.")
 
-        bartender_interjection = await self.get_bartender_interjection(round_num)
+async def generate_audio(self, round_num):
+    audio_tasks = []
+    for i, (npc, message) in enumerate(self.round_dialogues):
+        file_name = f"{npc.name}_round_{round_num}_dialogue_{i + 1}.mp3"
+        audio_task = asyncio.create_task(npc.speak(message, file_name))
+        audio_tasks.append(audio_task)
+    await asyncio.gather(*audio_tasks)
 
-        if bartender_interjection:
-            self.add_message("Bartender", bartender_interjection)
-            await self.update_dispositions(bartender_interjection)
+async def play_audio(self, round_num):
+    for i, (npc, _) in enumerate(self.round_dialogues):
+        file_name = f"{npc.name}_round_{round_num}_dialogue_{i + 1}.mp3"
+        subprocess.run(["afplay", file_name])
 
-        self.round_dialogues = []
-        dialogue_tasks = []
-        for i, npc in enumerate(self.participants):
-            dialogue_task = asyncio.create_task(self.generate_dialogue(npc, round_num, i + 1))
-            dialogue_tasks.append(dialogue_task)
-        await asyncio.gather(*dialogue_tasks)
-
-        audio_segment = await self.generate_audio(round_num)
-        await self.play_audio(audio_segment)
-
-    async def get_bartender_interjection(self, round_num):
-        bartender_task = asyncio.create_task(self.prompt_bartender(round_num))
-        try:
-            bartender_interjection = await asyncio.wait_for(bartender_task, timeout=5)
-            return bartender_interjection.strip() if bartender_interjection.strip() else None
-        except asyncio.TimeoutError:
-            return None
-
-    async def prompt_bartender(self, round_num):
-        return input(f"Bartender's interjection for round {round_num} (press Enter to skip): ")
+async def conduct_round(self, round_num, bartender_interjection):
+    if verbose:
+        logger.info(
+            f"Conducting round {round_num} of dialogue...\n\n Characters:{[npc.name for npc in self.participants]}\n\n")
+    self.add_message("Bartender", bartender_interjection)
+    await self.update_dispositions(bartender_interjection)
+    self.round_dialogues = []
+    dialogue_tasks = []
+    for i, npc in enumerate(self.participants):
+        dialogue_task = asyncio.create_task(self.generate_dialogue(npc, round_num, i + 1))
+        dialogue_tasks.append(dialogue_task)
+    await asyncio.gather(*dialogue_tasks)
+    await self.generate_audio(round_num)
+    await self.play_audio(round_num)
 
     async def update_dispositions(self, bartender_interjection):
         prompt = f"Bartender's interjection: {bartender_interjection}\n\nBased on the bartender's interjection, how does it affect each character's disposition towards different topics? Provide the updates in the following format:\n\nCharacter1:\nTopic1: DispositionChange\nTopic2: DispositionChange\n...\n\nCharacter2:\nTopic1: DispositionChange\nTopic2: DispositionChange\n...\n\nCharacter3:\nTopic1: DispositionChange\nTopic2: DispositionChange\n..."
@@ -265,7 +243,8 @@ async def main(num_rounds, num_characters):
         conversation = Conversation(npcs, global_context, local_context, instructions)
         # Conduct the specified number of rounds with bartender interjections
         for round_num in range(1, num_rounds + 1):
-            await conversation.conduct_round(round_num)
+            bartender_interjection = input(f"Bartender's interjection for round {round_num}: ")
+            await conversation.conduct_round(round_num, bartender_interjection)
         # Save the dialogue history to a file
         conversation.save_dialogue_history(config['dialogue_history_file'])
     except Exception as e:
@@ -277,4 +256,4 @@ if __name__ == "__main__":
     parser.add_argument('--characters', type=int, default=3, help='Number of characters to include (default: 3)')
     args = parser.parse_args()
 
-    asyncio.run(main(args.rounds, args.characters))
+asyncio.run(main(args.rounds, args.characters))
