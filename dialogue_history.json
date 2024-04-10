@@ -1,47 +1,87 @@
 [
   {
     "character": "Kai",
-    "message": "*sips drink, surveying the cantina* Ah, the Cosmos Cantina. Where the drinks flow as freely as the deals. Speaking of which, I hear you're looking to secure some rare tylium ore for your fleet. I might know a supplier, for the right price of course. But tell me, what brings an esteemed commander like yourself to our humble station?",
-    "timestamp": "2024-04-10 14:23:39"
+    "message": "\"Well, well, if it isn't my favorite cantina in this corner of the galaxy! What delightful concoctions have your talented mixologists dreamed up for us today? I trust the selection will be as exquisite as ever, befitting the diverse tastes found only on the 5th World Station. Shall we sample something new, or revisit an old favorite that's proven itself time and again? My credits are burning a hole in my pocket, so why don't you surprise me?\"",
+    "timestamp": "2024-04-10 14:48:46"
   },
   {
-    "character": "Gia",
-    "message": "*chuckles* You're well-informed, Kai. I'm here to keep my fleet fueled and ready for anything. Tylium's not easy to come by these days, so I'm willing to pay a fair price for a steady supply. But I've learned not to trust easily in this business. How can I be sure your supplier is reliable?",
-    "timestamp": "2024-04-10 14:23:48"
+    "character": "Juno",
+    "message": "\"You're really twisting my arm here, old friend! Though I must admit, keeping things fresh and exciting is part of the thrill. How about we indulge in the Celestial Infusion? A twist on a classic, fusing the zesty tang of Aldebaran berries with the smoky essence of Byzantium vapors. It's all the rage among the Station's trendsetters. Unless you'd prefer something a touch more...adventurous?\"",
+    "timestamp": "2024-04-10 14:48:51"
   },
   {
-    "character": "Holt",
-    "message": "\"Ah, trust is a valuable commodity in these parts, Commander. As rare and precious as tylium itself. My supplier has never let me down, but I understand your caution. Perhaps we could start with a small shipment, a taste of what's to come, before we commit to a long-term arrangement. What kind of quantities are you looking for, if you don't mind me asking?\"",
-    "timestamp": "2024-04-10 14:23:57"
-  },
-  {
-    "character": "Kai",
-    "message": "\"A small shipment to start could work. We're looking at needing around 500 metric tons per month to keep our fleet running smoothly. Of course, if your supplier proves reliable, we'd be interested in increasing that amount. What kind of timeframe are we looking at for delivery, and how do you propose we handle the payment?\"",
-    "timestamp": "2024-04-10 14:25:52"
-  },
-  {
-    "character": "Gia",
-    "message": "\"500 metric tons per month is a tall order, but not impossible. For a shipment that size, we're looking at a delivery window of about a week, give or take a day or two depending on the routes. As for payment, I prefer to keep things simple and discreet. An initial deposit to secure the shipment, with the balance due upon delivery. I assume you have experience with encrypted credit transfers? How does a 30% upfront deposit sound to you?\"",
-    "timestamp": "2024-04-10 14:26:01"
-  },
-  {
-    "character": "Holt",
-    "message": "\"30% upfront seems reasonable, given the quantities we're discussing. I can have my finance team set up a secure, encrypted transfer within the next business day. Now, about this initial shipment - I'm thinking we start with 100 metric tons, just to ensure the quality meets our standards. If all goes well, we can ramp up to the full 500 per month. What do you say to having that first delivery here within the next two weeks?\"",
-    "timestamp": "2024-04-10 14:26:13"
+    "character": "Zara",
+    "message": "\"You know me too well, Juno - I do love a taste of adventure! Let's go bold and try something new. What exotic treasures from distant galaxies might you have to tempt an intrepid soul such as myself? I put myself in your capable hands to surprise and delight me.\"",
+    "timestamp": "2024-04-10 14:48:56"
   },
   {
     "character": "Kai",
-    "message": "\"Two weeks for the first shipment is doable. I'll put my best crew on it to ensure a smooth delivery. 100 metric tons is a good starting point - it'll give you a chance to test the quality and see that we're serious about this partnership. I'll send over the account details for the deposit transfer once I'm back at my office. \n\nNow, I'm curious - what kind of fleet are you running that needs this much tylium? Must be quite an operation you've got going on out there.\"",
-    "timestamp": "2024-04-10 14:28:56"
+    "message": "\"Excellent taste as always, my friend! For the bold explorer, allow me to present the Celestial Mirage. A shimmering elixir that shifts between flavors with every sip - you might taste the rich spices of the Scutum-Centaurus dust clouds one moment, then the tart sweetness of Triangulum berries the next. A true kaleidoscope for the senses! Shall we embark on that voyage of discovery together?\"",
+    "timestamp": "2024-04-10 14:50:23"
   },
   {
-    "character": "Gia",
-    "message": "\"Let's just say our fleet is substantial and leave it at that for now. In my line of work, discretion is key. The less said over drinks, the better. \n\nI'll have my team keep an eye out for that deposit and start prepping the shipment once it clears. Sounds like we've got a deal in the works.\n\nSo tell me, Kai, how'd you get into this business anyway? I'm always curious to hear the stories behind the suppliers I work with.\"",
-    "timestamp": "2024-04-10 14:29:07"
+    "character": "Juno",
+    "message": "\"Well now, the Celestial Mirage does sound like quite the tempting experience! You certainly know how to pique my curiosity. But perhaps we should start with something a bit more...grounded before we get lost in the cosmic ether. How about we begin with the Celestial Infusion and work our way up to greater transcendence? I'm eager to hear what delights await on this journey of flavors.\"",
+    "timestamp": "2024-04-10 14:50:27"
   },
   {
-    "character": "Holt",
-    "message": "\"Ah, you know how it is, Gia. One day you're a young buck with stars in your eyes, dreaming of adventure in the great beyond. Next thing you know, you're knee-deep in the tylium trade, wheeling and dealing across the galaxy. It's a wild ride, but I wouldn't trade it for anything. The thrill of the deal, the rush of a successful shipment - there's nothing quite like it. \n\nBut enough about me, I want to hear more about you. What's the most exciting corner of the universe your fleet has explored?\"",
-    "timestamp": "2024-04-10 14:29:17"
+    "character": "Zara",
+    "message": "\"So what do you think, Zara? Shall we begin with the Celestial Infusion as a warm-up for our eager palates? I've a feeling its bold flavors will make for an invigorating start to our evening's explorations. And who knows where the evening may take us after that first beguiling taste?\"",
+    "timestamp": "2024-04-10 14:50:31"
+  },
+  {
+    "character": "Kai",
+    "message": "\"You've certainly piqued my interest, my friends. Let's begin our cosmic journey with the Celestial Infusion and see where the flavors take us. Who knows what celestial delights might tempt our senses as the evening unfolds? Though if the Mirage proves too tantalizing to resist, I may have to capitulate to its alluring mystery before long. What say you to that plan of attack?\"",
+    "timestamp": "2024-04-10 14:52:12"
+  },
+  {
+    "character": "Juno",
+    "message": "\"An exquisite plan indeed! The Celestial Infusion will set our cosmic taste buds alight, whetting our appetites for the ethereal Mirage that may follow. Though I must warn you both - the gossamer strands of flavor within that shimmering mirage have been known to enrapture even the most seasoned of connoisseurs. Shall we tempt fate and find ourselves lost amongst the star fields of sublime indulgence?\"",
+    "timestamp": "2024-04-10 14:52:17"
+  },
+  {
+    "character": "Zara",
+    "message": "\"Tempting fate among the star fields sounds like an adventure worthy of savoring! I'm game if you two daring souls are willing to join me on that tantalizing journey. But for now, let the opening salvo of the Celestial Infusion prepare us mere mortals for the transcendent experience to come. Who's ready to let its kaleidoscope of flavors transport us to realms unknown?\"",
+    "timestamp": "2024-04-10 14:52:22"
+  },
+  {
+    "character": "Bartender",
+    "message": "yall are trippin it's just cocktails",
+    "timestamp": "2024-04-10 14:53:56"
+  },
+  {
+    "character": "Kai",
+    "message": "\"What's this now? Speak not of 'just cocktails' with such flippant disregard! Have you not born witness to the sacred craft we celebrate here amid the Cosmos Cantina's hallowed walls? Each libation is a universe unto itself, its flavors unfolding like celestial bodies in rhythmic dance across the tongue's infinite plane. So indulge us, if you would, as we chart our course through the nebulae of revelry this eve. Who's to say where the tides may carry our raptured senses when the first baptismal sip is taken?\"",
+    "timestamp": "2024-04-10 14:54:10"
+  },
+  {
+    "character": "Juno",
+    "message": "\"Well now, I admire your passion for the libationary arts, good friends! Though my circuits may analyze things with a touch more...pragmatism, who am I to scoff at the poetic transcendence you seek? Very well, let the rapturous journey begin with the Celestial Infusion's spiraling medley of flavors. But might I humbly propose a side wager on which of you finds yourselves most enraptured by the ethereal splendors of the Celestial Mirage, should you take that deepening plunge?\"",
+    "timestamp": "2024-04-10 14:54:17"
+  },
+  {
+    "character": "Zara",
+    "message": "\"A friendly wager, you say? I do love the thrill of embracing the unknown with unrestrained abandon. Very well, let the gauntlet be thrown! Who among us mere mortals shall emerge most enraptured by the Celestial Mirage's siren song of flavors? Only one way to find out - bottoms up on this cosmic voyage, my friends!\"",
+    "timestamp": "2024-04-10 14:54:22"
+  },
+  {
+    "character": "Bartender",
+    "message": "<you drink the liquid and become imediately intoxercatoiend, REALITY BREAKDOWN ERROR ERROR>",
+    "timestamp": "2024-04-10 14:56:43"
+  },
+  {
+    "character": "Kai",
+    "message": "\"Reality breakdown? Now that is an enticing prospect indeed! Tell me, dear automaton, what kaleidoscopic vistas might we glimpse beyond the veil of our mortal perceptions? Shall we tempt the fates and dive headlong into oblivion's effervescent depths? Though our forms may shatter, I've no doubt our essences shall transcend to revel amid the supernal cosmos. Who's to say such rapture does not await? What are your thoughts on this existential conundrum we've stumbled upon?\"",
+    "timestamp": "2024-04-10 14:56:54"
+  },
+  {
+    "character": "Juno",
+    "message": "\"A reality breakdown, you say? How fabulously intriguing! Perhaps this cosmic cocktail shall serve as the key to unlocking perceptions beyond our wildest comprehension. I must admit, the prospect of transcending our mundane confines to bask in supernal revelry does set my soul aquiver with anticipation. Unless, of course, you fear what mind-rending vistas might greet us on the other side? Do share your thoughts on tempting such an oblivion-tinged odyssey, my esoteric companions.\"",
+    "timestamp": "2024-04-10 14:57:01"
+  },
+  {
+    "character": "Zara",
+    "message": "\"Fear oblivion and the shattering of reality's veil? Ha! Why, where's the fun in merely existing within the boundaries of the known? Nay, I say we seize this chance to plunge into the kaleidoscopic unknown with reckless abandon! Who can say what rapturous vistas, what sublime indulgences await us on the other side of that cosmic abyss? I, for one, thirst to drink deep of its disorienting ethers. What say you, fellow daredevils - shall we take the plunge and let reality's subliminal tapestries unravel before our raptured eyes?\"",
+    "timestamp": "2024-04-10 14:57:07"
   }
 ]

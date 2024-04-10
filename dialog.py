@@ -130,7 +130,7 @@ class Conversation:
             if dev_mode:
                 model = "claude-3-haiku-20240307"
             else:
-                model = "claude-3-opus-20240229"
+                model = "claude-3-sonnet-20240229"
             response = client.messages.create(
                 model=model,
                 max_tokens=1000,
